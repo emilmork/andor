@@ -1,0 +1,37 @@
+{
+  "name": "vercon",
+  "version": "0.0.1",
+  "description": "Conditional expresstion util for server/client",
+  "main": "./dist/index.js",
+  "scripts": {
+    "test": "gulp &&./node_modules/.bin/mocha --reporter spec",
+    "prepublish": "gulp"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/emilmork/react-rt-chart.git"
+  },
+  "keywords": [
+    "assert",
+    "verify",
+    "check",
+    "condition"
+  ],
+  "author": "Emil Mork <emil.a.mork@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/emilmork/react-rt-chart/issues"
+  },
+  "homepage": "https://github.com/emilmork/react-rt-chart",
+  "devDependencies": {
+    "babel": "^5.8.23",
+    "babel-preset-es2015": "^6.1.18",
+    "chai": "^3.3.0",
+    "gulp": "^3.9.0",
+    "gulp-babel": "^6.1.0",
+    "mocha": "^2.3.3"
+  },
+  "dependencies": {
+
+  }
+}
