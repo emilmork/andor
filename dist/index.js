@@ -1,8 +1,8 @@
 "use strict";
 
-function _toArray(arr) { return Array.isArray(arr) ? arr : Array.from(arr); }
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
-var data = [];
+var d = {};
 var log = function log(msg) {
   var _console;
 
@@ -19,89 +19,62 @@ var isFunction = function isFunction(o) {
   var f = {};
   return o && f.toString.call(o) === '[object Function]';
 };
-var operators = {
-  'or': function or(a, b) {
-    return call(a) || call(b);
-  },
-  'and': function and(a, b) {
-    return call(a) && call(b);
-  }
-};
 
 function call(a) {
   if (isBoolean(a)) return a;
-  if (isFunction(a)) return a(data);
+  if (isFunction(a)) return a(d);
   return false;
 }
 
-function evaluateExpressions(_ref, operator) {
-  var _ref2 = _toArray(_ref);
-
-  var head = _ref2[0];
-
-  var tail = _ref2.slice(1);
-
-  var isTrue = arguments.length <= 2 || arguments[2] === undefined ? true : arguments[2];
-
-  if (operator === 'or' && isTrue) return true;
-  if (operator === 'and' && head == false) return false;
-  if (!head && !isBoolean(head)) return isTrue;
-
-  log(operator);
-  log("isTrue: ", isTrue);
-  log(head, tail);
-  var nextOp = tail[0] && tail[0].o ? tail[0].o : operator;
-  return evaluateExpressions(tail, nextOp, operators[operator](head.fn || head, isTrue));
-}
-
 function and(a) {
-  for (var _len2 = arguments.length, args = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
-    args[_key2 - 1] = arguments[_key2];
+  for (var _len2 = arguments.length, rest = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+    rest[_key2 - 1] = arguments[_key2];
   }
 
-  return evaluateExpressions([a].concat(args), 'and');
+  if (rest.length === 0) {
+    return call(a);
+  }
+
+  return call(a) && and.apply(undefined, rest);
 }
 
 function or(a) {
-  for (var _len3 = arguments.length, args = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
-    args[_key3 - 1] = arguments[_key3];
+  if (a === true) return true;
+
+  for (var _len3 = arguments.length, rest = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
+    rest[_key3 - 1] = arguments[_key3];
   }
 
-  return evaluateExpressions([a].concat(args), 'or');
+  if (rest.length === 0) return call(a);
+
+  return call(a) || or.apply(undefined, rest);
 }
 
-function is(a) {
-  for (var _len4 = arguments.length, args = Array(_len4 > 1 ? _len4 - 1 : 0), _key4 = 1; _key4 < _len4; _key4++) {
-    args[_key4 - 1] = arguments[_key4];
-  }
-
-  return evaluateExpressions([a].concat(args), 'and');
-}
-
-function has(a) {
-  for (var _len5 = arguments.length, args = Array(_len5 > 1 ? _len5 - 1 : 0), _key5 = 1; _key5 < _len5; _key5++) {
-    args[_key5 - 1] = arguments[_key5];
-  }
-
-  return evaluateExpressions([a].concat(args), 'and');
-}
-
-function getExp(o, fn) {
-  return { o: o, fn: fn };
+function not(a) {
+  return !a;
 }
 
 var Vercon = function Vercon(data) {
-  data = data;
-  this.chain = [];
+  d = data;
+  this.ands = [];
+  this.ors = [];
   return this;
 };
 
-Vercon.prototype.is = function (fn) {
-  return this.and(fn);
+Vercon.prototype.is = function (input) {
+  for (var _len4 = arguments.length, rest = Array(_len4 > 1 ? _len4 - 1 : 0), _key4 = 1; _key4 < _len4; _key4++) {
+    rest[_key4 - 1] = arguments[_key4];
+  }
+
+  return this.and.apply(this, [input].concat(rest));
 };
 
-Vercon.prototype.has = function (fn) {
-  return this.and(fn);
+Vercon.prototype.has = function (input) {
+  for (var _len5 = arguments.length, rest = Array(_len5 > 1 ? _len5 - 1 : 0), _key5 = 1; _key5 < _len5; _key5++) {
+    rest[_key5 - 1] = arguments[_key5];
+  }
+
+  return this.and.apply(this, [input].concat(rest));
 };
 
 Vercon.prototype.and = function (input) {
@@ -109,11 +82,7 @@ Vercon.prototype.and = function (input) {
     rest[_key6 - 1] = arguments[_key6];
   }
 
-  var restArgs = rest.map(function (f) {
-    return getExp('and', f);
-  });
-  log("restArgs ", restArgs);
-  this.chain.push(and(getExp('and', input), restArgs));
+  this.ands.push(and.apply(undefined, [input].concat(rest)));
   return this;
 };
 
@@ -122,30 +91,23 @@ Vercon.prototype.or = function (input) {
     rest[_key7 - 1] = arguments[_key7];
   }
 
-  var restArgs = rest.map(function (f) {
-    return getExp('or', f);
-  });
-  this.chain.push(or(getExp('or', restArgs), restArgs));
+  this.ors.push(or.apply(undefined, [input].concat(rest)));
   return this;
 };
 
 Vercon.prototype.isTrue = function () {
-  log(this.chain);
+  if (this.ors.length > 0) {
+    return or.apply(undefined, [and.apply(undefined, _toConsumableArray(this.ands))].concat(_toConsumableArray(this.ors)));
+  }
 
-  var _chain = _toArray(this.chain);
-
-  var h = _chain[0];
-
-  var rest = _chain.slice(1);
-
-  var val = evaluateExpressions(rest, 'or', call(h.fn));
-  log(val);
-  return val;
+  return and.apply(undefined, _toConsumableArray(this.ands));
 };
 
 module.exports.and = and;
+module.exports.is = and;
+module.exports.has = and;
 module.exports.or = or;
-module.exports.is = is;
+module.exports.not = not;
 
 module.exports.verifyThat = function (o) {
   return new Vercon(o);

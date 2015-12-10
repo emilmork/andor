@@ -6,20 +6,61 @@ var verifyThat = VT.verifyThat;
 var and = VT.and;
 var or = VT.or;
 var is = VT.is;
+var has = VT.has;
 
-var merried = (person) => person.civilStatus == 'merried';
+var merried = (person) => person.sivilStatus == 'merried';
 var retired = (person) => person.age > 67;
-var isDeveloper = (person) => person.isDeveloper;
+var isDeveloper = (person) => person.profession === 1;
+var isBelow180 = (person) => person.height < 180;
+var isAbove175 = (person) => person.height > 175;
+
+var person = {
+  name: 'Emil',
+  sivilStatus: 'cohabitant',
+  age: 26,
+  profession: 1,
+  height: 178
+}
 
 var isTrue = () => true;
 var notTrue = () => false
 
+var checkIsTrue = (val) => expect(val).to.be.true;
+var checkIsFalse = (val) => expect(val).to.be.false;
+
 describe('Condititional simple', function() {
 
+  it('should pass on simple booleans', function() {
+
+    var shouldBeTrue = verifyThat({}).is(true).and(true).and(true).isTrue();
+    var shouldBeTrue2 = verifyThat({}).is(false).and(true).and(true).or(true).isTrue();
+    var shouldBeFalse = verifyThat({}).is(false).and(false).or(false).isTrue();
+
+    expect(shouldBeTrue).to.be.true;
+    expect(shouldBeTrue2).to.be.true;
+    expect(shouldBeFalse).to.be.false;
+
+    checkIsTrue(and(true));
+    checkIsTrue(and(true, true));
+    checkIsTrue(and(true, true, true));
+
+    checkIsTrue(or(true));
+    checkIsTrue(or(true, true));
+    checkIsTrue(or(true, true, true));
+
+    checkIsFalse(and(false));
+    checkIsFalse(and(false, false));
+    checkIsFalse(and(false, false, true));
+
+    checkIsFalse(or(false));
+    checkIsFalse(or(false, false));
+    checkIsFalse(or(false, false, false));
+
+  })
   it('should not pass when undefined', function() {
       expect(verifyThat({})
           .is(isTrue)  
-          .and(false)
+          .and(undefined)
           .isTrue()).to.be.false;
   });
 
@@ -56,11 +97,10 @@ describe('Condititional simple', function() {
 describe('Conditions with data', function() {
 
     it('should pass when person is 40 years old and merried', function() {
-      var person = { civilStatus: 'merried', age: 40 };
 
       expect(verifyThat(person)
-          .is(merried)  
-          .and(retired)
+          .is(retired)  
+          .and(isDeveloper)
           .isTrue()).to.be.false;
     });
 
@@ -120,14 +160,25 @@ describe('Combined nested expresstions', function() {
     });
 
     it('should be possible to pass (and/ors) to chain', function() {
-      var person = { civilStatus: 'merried', age: 40, isDeveloper: true };
 
+      var orEither = or(isDeveloper, false);
       var cond = verifyThat(person)
                     .is(merried)
-                    .and(retired, or(isDeveloper, false)).isTrue;
+                    .and(retired, or(isDeveloper, merried)).isTrue();
 
       expect(cond).to.be.false;
 
+    });
+
+    it("should be possible to combind all operators", function() {
+
+        var cond = verifyThat(person)
+                      .is(merried)
+                      .and(merried)
+                      .and(merried)
+                      .or(isDeveloper).isTrue();
+
+        expect(cond).to.be.true;
     });
 
 
