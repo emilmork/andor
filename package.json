@@ -1,5 +1,5 @@
 {
-  "name": "vercon",
+  "name": "andor",
   "version": "0.0.1",
   "description": "Conditional expresstion util for server/client",
   "main": "./dist/index.js",
@@ -30,8 +30,5 @@
     "gulp": "^3.9.0",
     "gulp-babel": "^6.1.0",
     "mocha": "^2.3.3"
-  },
-  "dependencies": {
-
   }
 }
