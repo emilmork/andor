@@ -1,7 +1,7 @@
 var should = require('chai').should();
 var expect = require('chai').expect;
 
-var VT = require('../dist/index.js');;
+var VT = require('../src');;
 var verifyThat = VT.verifyThat;
 var and = VT.and;
 var or = VT.or;
@@ -59,7 +59,7 @@ describe('Condititional simple', function() {
   })
   it('should not pass when undefined', function() {
       expect(verifyThat({})
-          .is(isTrue)  
+          .is(isTrue)
           .and(undefined)
           .isTrue()).to.be.false;
   });
@@ -69,17 +69,17 @@ describe('Condititional simple', function() {
           .is(isTrue)
           .and(isTrue)
           .and(notTrue)
-          .and(isTrue)    
+          .and(isTrue)
           .isTrue()).to.be.false;
   });
-  
+
   it('should pass when .or() is true', function() {
       expect(verifyThat({})
           .is(isTrue)
           .or(notTrue)
           .or(notTrue)
-          .or(isTrue)    
-          .or(notTrue)    
+          .or(isTrue)
+          .or(notTrue)
           .isTrue()).to.be.true;
   });
 
@@ -88,7 +88,7 @@ describe('Condititional simple', function() {
           .is(isTrue)
           .or(notTrue)
           .or(notTrue)
-          .or(isTrue)       
+          .or(isTrue)
           .isTrue()).to.be.true;
   });
 
@@ -99,7 +99,7 @@ describe('Conditions with data', function() {
     it('should pass when person is 40 years old and merried', function() {
 
       expect(verifyThat(person)
-          .is(retired)  
+          .is(retired)
           .and(isDeveloper)
           .isTrue()).to.be.false;
     });
@@ -145,7 +145,7 @@ describe('Single conditions without chaining', function() {
 describe('Combined nested expresstions', function() {
 
     it('should be possible to pass or´s to and', function() {
-      
+
       var cond = and(isTrue, or(isTrue, notTrue));
 
       expect(cond).to.be.true;
@@ -183,4 +183,3 @@ describe('Combined nested expresstions', function() {
 
 
 });
-
